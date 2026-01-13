@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Manutenção - Mobile</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        const Clock = () => (
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+        );
+
+        const Wrench = ({className = "w-5 h-5"}) => (
+            <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+        );
+
+        const Thermometer = ({className = "w-5 h-5"}) => (
+            <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
+        );
+
+        const Droplets = ({className = "w-5 h-5"}) => (
+            <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+            </svg>
+        );
+
+        const Download = ({className = "w-5 h-5"}) => (
+            <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+            </svg>
+        );
+
+        const Plus = ({className = "w-5 h-5"}) => (
+            <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+        );
+
+        const Trash2 = ({className = "w-4 h-4"}) => (
+            <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+        );
+
+        const Menu = ({className = "w-6 h-6"}) => (
+            <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+        );
+
+        const XIcon = ({className = "w-6 h-6"}) => (
+            <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        );
+
+        function MaintenanceDashboardMobile() {
+            const [dashboards, setDashboards] = useState([{
+                id: 1,
+                startDateTime: new Date(),
+                formData: {
+                    nascedouro: false,
+                    nascedouroMaquina: '',
+                    incubadora: false,
+                    incubadoraMaquina: '',
+                    defeito: '',
+                    observacoes: '',
+                    notacoes: '',
+                    consertos: [{ numero: 1, horario: new Date(), problema: '', falha: '' }],
+                    tempMaquina: '',
+                    tempAparelho: ''
+                },
+                tempData: [{ time: '00:00', temp: 98.6 }, { time: '04:00', temp: 99.2 }, { time: '08:00', temp: 98.8 }, { time: '12:00', temp: 99.5 }, { time: '16:00', temp: 99.1 }, { time: '20:00', temp: 98.9 }],
+                humidityData: [{ time: '00:00', humidity: 85 }, { time: '04:00', humidity: 87 }, { time: '08:00', humidity: 84 }, { time: '12:00', humidity: 86 }, { time: '16:00', humidity: 88 }, { time: '20:00', humidity: 85 }],
+                showTempNumbers: false,
+                showHumidityNumbers: false
+            }]);
+
+            const [currentDashboardIndex, setCurrentDashboardIndex] = useState(0);
+            const [showMenu, setShowMenu] = useState(false);
+
+            const currentDashboard = dashboards[currentDashboardIndex];
+
+            const updateCurrentDashboard = (updates) => {
+                const newDashboards = [...dashboards];
+                newDashboards[currentDashboardIndex] = { ...currentDashboard, ...updates };
+                setDashboards(newDashboards);
+            };
+
+            const updateFormData = (updates) => {
+                updateCurrentDashboard({ formData: { ...currentDashboard.formData, ...updates } });
+            };
+
+            const createNewDashboard = () => {
+                const newDashboard = {
+                    id: dashboards.length + 1,
+                    startDateTime: new Date(),
+                    formData: {
+                        nascedouro: false,
+                        nascedouroMaquina: '',
+                        incubadora: false,
+                        incubadoraMaquina: '',
+                        defeito: '',
+                        observacoes: '',
+                        notacoes: '',
+                        consertos: [{ numero: 1, horario: new Date(), problema: '', falha: '' }],
+                        tempMaquina: '',
+                        tempAparelho: ''
+                    },
+                    tempData: [{ time: '00:00', temp: 98.6 }, { time: '04:00', temp: 99.2 }, { time: '08:00', temp: 98.8 }, { time: '12:00', temp: 99.5 }, { time: '16:00', temp: 99.1 }, { time: '20:00', temp: 98.9 }],
+                    humidityData: [{ time: '00:00', humidity: 85 }, { time: '04:00', humidity: 87 }, { time: '08:00', humidity: 84 }, { time: '12:00', humidity: 86 }, { time: '16:00', humidity: 88 }, { time: '20:00', humidity: 85 }],
+                    showTempNumbers: false,
+                    showHumidityNumbers: false
+                };
+                setDashboards([...dashboards, newDashboard]);
+                setCurrentDashboardIndex(dashboards.length);
+                setShowMenu(false);
+            };
+
+            const addConserto = () => {
+                const newConsertos = [...currentDashboard.formData.consertos];
+                newConsertos.push({ numero: newConsertos.length + 1, horario: new Date(), problema: '', falha: '' });
+                updateFormData({ consertos: newConsertos });
+            };
+
+            const updateConserto = (index, field, value) => {
+                const newConsertos = [...currentDashboard.formData.consertos];
+                newConsertos[index][field] = value;
+                updateFormData({ consertos: newConsertos });
+            };
+
+            const removeConserto = (index) => {
+                if (currentDashboard.formData.consertos.length > 1) {
+                    const newConsertos = currentDashboard.formData.consertos.filter((_, i) => i !== index);
+                    newConsertos.forEach((c, i) => c.numero = i + 1);
+                    updateFormData({ consertos: newConsertos });
+                }
+            };
+
+            const addTempPoint = () => {
+                const newTime = `${String(currentDashboard.tempData.length * 4).padStart(2, '0')}:00`;
+                updateCurrentDashboard({ tempData: [...currentDashboard.tempData, { time: newTime, temp: 99.0 }] });
+            };
+
+            const updateTempPoint = (index, value) => {
+                const newData = [...currentDashboard.tempData];
+                newData[index].temp = parseFloat(value) || 0;
+                updateCurrentDashboard({ tempData: newData });
+            };
+
+            const removeTempPoint = (index) => {
+                if (currentDashboard.tempData.length > 1) {
+                    updateCurrentDashboard({ tempData: currentDashboard.tempData.filter((_, i) => i !== index) });
+                }
+            };
+
+            const addHumidityPoint = () => {
+                const newTime = `${String(currentDashboard.humidityData.length * 4).padStart(2, '0')}:00`;
+                updateCurrentDashboard({ humidityData: [...currentDashboard.humidityData, { time: newTime, humidity: 85 }] });
+            };
+
+            const updateHumidityPoint = (index, value) => {
+                const newData = [...currentDashboard.humidityData];
+                newData[index].humidity = parseFloat(value) || 0;
+                updateCurrentDashboard({ humidityData: newData });
+            };
+
+            const removeHumidityPoint = (index) => {
+                if (currentDashboard.humidityData.length > 1) {
+                    updateCurrentDashboard({ humidityData: currentDashboard.humidityData.filter((_, i) => i !== index) });
+                }
+            };
+
+            const tempChartRef = useRef(null);
+            const humidityChartRef = useRef(null);
+
+            useEffect(() => {
+                if (!tempChartRef.current) return;
+                const ctx = tempChartRef.current.getContext('2d');
+                const chart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: currentDashboard.tempData.map(d => d.time),
+                        datasets: [{
+                            data: currentDashboard.tempData.map(d => d.temp),
+                            borderColor: '#dc2626',
+                            pointBackgroundColor: '#dc2626',
+                            tension: 0.2,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: { y: { min: 67, max: 103 } },
+                        plugins: { legend: { display: false }, tooltip: { enabled: true } }
+                    }
+                });
+                return () => chart.destroy();
+            }, [currentDashboard.tempData]);
+
+            useEffect(() => {
+                if (!humidityChartRef.current) return;
+                const ctx = humidityChartRef.current.getContext('2d');
+                const chart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: currentDashboard.humidityData.map(d => d.time),
+                        datasets: [{
+                            data: currentDashboard.humidityData.map(d => d.humidity),
+                            borderColor: '#2563eb',
+                            pointBackgroundColor: '#2563eb',
+                            tension: 0.2,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: { y: { min: 70, max: 100 } },
+                        plugins: { legend: { display: false }, tooltip: { enabled: true } }
+                    }
+                });
+                return () => chart.destroy();
+            }, [currentDashboard.humidityData]);
+
+            const exportReport = () => {
+                const report = `
+═══════════════════════════════════════════════════════════
+RELATÓRIO DE MANUTENÇÃO PREVENTIVA
+═══════════════════════════════════════════════════════════
+HORÁRIO DE INÍCIO: ${currentDashboard.startDateTime.toLocaleString('pt-BR')}
+
+TIPO DE MÁQUINA:
+${currentDashboard.formData.nascedouro ? `☑ NASCEDOURO - Máquina Nº ${currentDashboard.formData.nascedouroMaquina}` : '☐ NASCEDOURO'}
+${currentDashboard.formData.incubadora ? `☑ INCUBADORA - Máquina Nº ${currentDashboard.formData.incubadoraMaquina}` : '☐ INCUBADORA'}
+
+DEFEITO DA MÁQUINA:
+${currentDashboard.formData.defeito || 'Não informado'}
+
+GRÁFICO DE TEMPERATURA:
+${currentDashboard.tempData.map(d => `${d.time} - ${d.temp}°F`).join('\n')}
+
+GRÁFICO DE UMIDADE:
+${currentDashboard.humidityData.map(d => `${d.time} - ${d.humidity}%`).join('\n')}
+
+OBSERVAÇÕES:
+${currentDashboard.formData.observacoes || 'Nenhuma'}
+
+CONSERTOS REALIZADOS:
+${currentDashboard.formData.consertos.map(c => `
+Conserto ${c.numero}:
+  Horário: ${c.horario.toLocaleString('pt-BR')}
+  Problema: ${c.problema || 'Não informado'}
+  Tipo de Falha: ${c.falha ? c.falha.toUpperCase() : 'Não selecionado'}
+`).join('\n')}
+
+NOTAÇÕES:
+${currentDashboard.formData.notacoes || 'Nenhuma'}
+
+TEMPERATURAS:
+Temperatura na Máquina: ${currentDashboard.formData.tempMaquina ? currentDashboard.formData.tempMaquina + '°F' : 'Não informado'}
+Temperatura no Aparelho: ${currentDashboard.formData.tempAparelho ? currentDashboard.formData.tempAparelho + '°F' : 'Não informado'}
+═══════════════════════════════════════════════════════════
+`;
+
+                const blob = new Blob([report], { type: 'text/plain;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                const machine = currentDashboard.formData.nascedouroMaquina || currentDashboard.formData.incubadoraMaquina || 'dashboard';
+                const dateStr = currentDashboard.startDateTime.toLocaleDateString('pt-BR').replace(/\//g, '-');
+                a.download = `Manutencao_${machine}_${dateStr}.txt`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                alert('Relatório exportado com sucesso!');
+            };
+
+            return (
+                <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+                    <div className="bg-gradient-to-r from-blue-600 to-indigo-600 shadow-lg p-4 sticky top-0 z-50">
+                        <div className="flex items-center justify-between mb-2">
+                            <div className="flex items-center gap-2">
+                                <Wrench className="w-6 h-6 text-white" />
+                                <div>
+                                    <h1 className="text-lg font-bold text-white">MANUTENÇÃO</h1>
+                                    <p className="text-xs text-blue-100">Dashboard {currentDashboard.id}/{dashboards.length}</p>
+                                </div>
+                            </div>
+                            <button onClick={() => setShowMenu(!showMenu)} className="text-white p-2 hover:bg-white/20 rounded-lg">
+                                {showMenu ? <XIcon /> : <Menu />}
+                            </button>
+                        </div>
+                        <div className="flex items-center gap-2 text-xs bg-white/20 px-3 py-2 rounded-lg text-white">
+                            <Clock />
+                            <div>
+                                <div className="text-[10px] text-blue-100">Iniciado:</div>
+                                <div className="font-semibold">{currentDashboard.startDateTime.toLocaleString('pt-BR', {day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'})}</div>
+                            </div>
+                        </div>
+                        {showMenu && (
+                            <div className="mt-3 bg-white rounded-lg shadow-lg p-3 space-y-2">
+                                <button onClick={createNewDashboard} className="w-full flex items-center gap-2 bg-green-500 text-white px-3 py-2 rounded-lg font-semibold text-sm">
+                                    <Plus className="w-4 h-4" />
+                                    Nova Manutenção
+                                </button>
+                                {dashboards.length > 1 && (
+                                    <div className="pt-2 border-t">
+                                        <p className="text-xs font-semibold text-gray-600 mb-2">Alternar Dashboard:</p>
+                                        <div className="space-y-1 max-h-40 overflow-y-auto">
+                                            {dashboards.map((dash, index) => (
+                                                <button key={dash.id} onClick={() => { setCurrentDashboardIndex(index); setShowMenu(false); }} className={`w-full text-left px-3 py-2 rounded-lg text-sm ${index === currentDashboardIndex ? 'bg-blue-500 text-white font-semibold' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>
+                                                    Dashboard {dash.id} {dash.formData.nascedouroMaquina && `- N${dash.formData.nascedouroMaquina}`} {dash.formData.incubadoraMaquina && `- I${dash.formData.incubadoraMaquina}`}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="p-4 space-y-6 pb-24">
+                        <div className="space-y-3">
+                            <div className="bg-white border-2 border-blue-200 rounded-xl p-4">
+                                <div className="flex items-center gap-3 mb-3">
+                                    <input type="checkbox" checked={currentDashboard.formData.nascedouro} onChange={(e) => updateFormData({ nascedouro: e.target.checked })} className="w-5 h-5 text-blue-600 rounded" />
+                                    <label className="text-base font-semibold text-gray-700">NASCEDOURO</label>
+                                </div>
+                                <input type="text" placeholder="Nº Máquina (1-62)" value={currentDashboard.formData.nascedouroMaquina} onChange={(e) => updateFormData({ nascedouroMaquina: e.target.value })} className="w-full px-3 py-2 border-2 border-gray-300 rounded-lg text-base" />
+                            </div>
+                            <div className="bg-white border-2 border-indigo-200 rounded-xl p-4">
+                                <div className="flex items-center gap-3 mb-3">
+                                    <input type="checkbox" checked={currentDashboard.formData.incubadora} onChange={(e) => updateFormData({ incubadora: e.target.checked })} className="w-5 h-5 text-indigo-600 rounded" />
+                                    <label className="text-base font-semibold text-gray-700">INCUBADORA</label>
+                                </div>
+                                <input type="text" placeholder="Nº Máquina (1-62)" value={currentDashboard.formData.incubadoraMaquina} onChange={(e) => updateFormData({ incubadoraMaquina: e.target.value })} className="w-full px-3 py-2 border-2 border-gray-300 rounded-lg text-base" />
+                            </div>
+                        </div>
+
+                        <div className="bg-white rounded-xl p-4 shadow-md">
+                            <label className="block text-base font-semibold text-gray-700 mb-2">Defeito da Máquina</label>
+                            <textarea value={currentDashboard.formData.defeito} onChange={(e) => updateFormData({ defeito: e.target.value })} className="w-full px-3 py-2 border-2 border-gray-300 rounded-lg text-base" rows="3" placeholder="Descreva o defeito..." />
+                        </div>
+
+                        <div className="bg-gradient-to-br from-red-50 to-orange-50 rounded-xl p-4 shadow-md">
+                            <div className="flex items-center justify-between mb-3">
+                                <div className="flex items-center gap-2">
+                                    <Thermometer className="w-5 h-5 text-red-600" />
+                                    <h3 className="text-sm font-semibold text-gray-800">Temperatura (67-103°F)</h3>
+                                </div>
+                                <button onClick={addTempPoint} className="bg-red-500 text-white px-2 py-1 rounded-lg text-xs">+ Ponto</button>
+                            </div>
+                            <div className="w-full" style={{height: '200px'}}>
+                                <canvas ref={tempChartRef}></canvas>
+                            </div>
+                            <button onClick={() => updateCurrentDashboard({ showTempNumbers: !currentDashboard.showTempNumbers })} className="mt-3 w-full bg-red-100 text-red-700 py-2 rounded-lg text-sm font-semibold">
+                                {currentDashboard.showTempNumbers ? 'Ocultar' : 'Ver Números'}
+                            </button>
+                            {currentDashboard.showTempNumbers && (
+                                <div className="mt-3 space-y-2 overflow-y-auto max-h-60">
+                                    {currentDashboard.tempData.map((point, index) => (
+                                        <div key={index} className="flex items-center gap-2 bg-white p-2 rounded-lg">
+                                            <span className="text-xs font-semibold min-w-[50px]">{point.time}</span>
+                                            <input type="number" value={point.temp} onChange={(e) => updateTempPoint(index, e.target.value)} step="0.1" min="67" max="103" className="flex-1 px-2 py-1 border border-gray-300 rounded text-sm" />
+                                            <span className="text-xs">°F</span>
+                                            <button onClick={() => removeTempPoint(index)} className="text-red-600"><Trash2 /></button>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl p-4 shadow-md">
+                            <div className="flex items-center justify-between mb-3">
+                                <div className="flex items-center gap-2">
+                                    <Droplets className="w-5 h-5 text-blue-600" />
+                                    <h3 className="text-sm font-semibold text-gray-800">Umidade (70-100%)</h3>
+                                </div>
+                                <button onClick={addHumidityPoint} className="bg-blue-500 text-white px-2 py-1 rounded-lg text-xs">+ Ponto</button>
+                            </div>
+                            <div className="w-full" style={{height: '200px'}}>
+                                <canvas ref={humidityChartRef}></canvas>
+                            </div>
+                            <button onClick={() => updateCurrentDashboard({ showHumidityNumbers: !currentDashboard.showHumidityNumbers })} className="mt-3 w-full bg-blue-100 text-blue-700 py-2 rounded-lg text-sm font-semibold">
+                                {currentDashboard.showHumidityNumbers ? 'Ocultar' : 'Ver Números'}
+                            </button>
+                            {currentDashboard.showHumidityNumbers && (
+                                <div className="mt-3 space-y-2 overflow-y-auto max-h-60">
+                                    {currentDashboard.humidityData.map((point, index) => (
+                                        <div key={index} className="flex items-center gap-2 bg-white p-2 rounded-lg">
+                                            <span className="text-xs font-semibold min-w-[50px]">{point.time}</span>
+                                            <input type="number" value={point.humidity} onChange={(e) => updateHumidityPoint(index, e.target.value)} step="1" min="70" max="100" className="flex-1 px-2 py-1 border border-gray-300 rounded text-sm" />
+                                            <span className="text-xs">%</span>
+                                            <button onClick={() => removeHumidityPoint(index)} className="text-blue-600"><Trash2 /></button>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="bg-white rounded-xl p-4 shadow-md">
+                            <label className="block text-base font-semibold text-gray-700 mb-2">Observações</label>
+                            <textarea value={currentDashboard.formData.observacoes} onChange={(e) => updateFormData({ observacoes: e.target.value })} className="w-full px-3 py-2 border-2 border-gray-300 rounded-lg text-base" rows="3" placeholder="Observações adicionais..." />
+                        </div>
+
+                        <div className="bg-white rounded-xl p-4 shadow-md">
+                            <div className="flex items-center justify-between mb-3">
+                                <h3 className="text-base font-semibold text-gray-700">Consertos Realizados</h3>
+                                <button onClick={addConserto} className="bg-green-500 text-white px-3 py-2 rounded-lg text-sm flex items-center gap-1"><Plus className="w-4 h-4" />Adicionar</button>
+                            </div>
+                            <div className="space-y-4">
+                                {currentDashboard.formData.consertos.map((c, index) => (
+                                    <div key={index} className="border border-gray-300 rounded-xl p-4 bg-gray-50">
+                                        <div className="flex justify-between items-center mb-2">
+                                            <h4 className="font-bold text-base">Conserto {c.numero}</h4>
+                                            {currentDashboard.formData.consertos.length > 1 && <button onClick={() => removeConserto(index)} className="text-red-600"><Trash2 /></button>}
+                                        </div>
+                                        <p className="text-sm text-gray-600 mb-3">Horário: {c.horario.toLocaleString('pt-BR')}</p>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">Problema</label>
+                                        <textarea value={c.problema} onChange={(e) => updateConserto(index, 'problema', e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" rows="3" />
+                                        <label className="block text-sm font-medium text-gray-700 mt-3 mb-1">Tipo de Falha</label>
+                                        <select value={c.falha} onChange={(e) => updateConserto(index, 'falha', e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                                            <option value="">Selecione</option>
+                                            <option value="mecânica">Mecânica</option>
+                                            <option value="elétrica">Elétrica</option>
+                                            <option value="hidráulica">Hidráulica</option>
+                                            <option value="outra">Outra</option>
+                                        </select>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div className="bg-white rounded-xl p-4 shadow-md">
+                            <label className="block text-base font-semibold text-gray-700 mb-2">Notações</label>
+                            <textarea value={currentDashboard.formData.notacoes} onChange={(e) => updateFormData({ notacoes: e.target.value })} className="w-full px-3 py-2 border-2 border-gray-300 rounded-lg text-base" rows="3" placeholder="Notações adicionais..." />
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="bg-white rounded-xl p-4 shadow-md">
+                                <label className="block text-sm font-semibold text-gray-700 mb-2">Temp. Máquina (°F)</label>
+                                <input type="text" value={currentDashboard.formData.tempMaquina} onChange={(e) => updateFormData({ tempMaquina: e.target.value })} className="w-full px-3 py-2 border-2 border-gray-300 rounded-lg text-base" placeholder="Ex: 99.5" />
+                            </div>
+                            <div className="bg-white rounded-xl p-4 shadow-md">
+                                <label className="block text-sm font-semibold text-gray-700 mb-2">Temp. Aparelho (°F)</label>
+                                <input type="text" value={currentDashboard.formData.tempAparelho} onChange={(e) => updateFormData({ tempAparelho: e.target.value })} className="w-full px-3 py-2 border-2 border-gray-300 rounded-lg text-base" placeholder="Ex: 99.0" />
+                            </div>
+                        </div>
+
+                        <button onClick={exportReport} className="w-full bg-green-600 hover:bg-green-700 text-white py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-3 shadow-lg">
+                            <Download className="w-6 h-6" />
+                            Exportar Relatório
+                        </button>
+                    </div>
+                </div>
+            );
+        }
+
+        ReactDOM.render(<MaintenanceDashboardMobile />, document.getElementById('root'));
+    </script>
+</body>
+</html>
